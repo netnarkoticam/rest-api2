@@ -4,6 +4,6 @@ import (
 	"github.com/netnarkoticam/rest-api2.git/internal/app"
 )
 
-func main(){
+func main() {
 	app.RunServer()
 }

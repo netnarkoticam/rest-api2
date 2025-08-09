@@ -32,7 +32,7 @@ lint: install-lint # Run lint
 
 .PHONY: build
 build: # Build app
-	$(info Building penalty locally...)
+	$(info Building app locally...)
 	go build -ldflags="-X main.version=$(shell git rev-parse --short HEAD)" -o "$(LOCAL_BIN)/$(APP_NAME)" ./cmd/app
 
 test: install-gotestsum # Run all tests
