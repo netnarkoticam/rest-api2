@@ -1,6 +1,6 @@
 GOFILES = $(shell find . -type f -name '*.go')
 LOCAL_BIN:=$(CURDIR)/bin
-APP_NAME=order-service
+APP_NAME=employee-info-service
 
 ifeq ($(OS),Windows_NT)
 	GOLANGCI_BIN:=$(LOCAL_BIN)/golangci-lint.exe
