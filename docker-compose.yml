@@ -1,9 +1,15 @@
 services:
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./:/app/src
-    environment:
-      - GIN_MODE=debug
+  db:
+  image: postgres:15
+  restart: always
+  enviroment:
+    POSTGRES_USER: user
+    POSTGRES_PASSWORD: password
+    POSTGRES_DB: mydb
+  ports:
+   - "5432:5432"
+  volumes:
+   -pgdata:/var/lib/postgressql/data
+
+volumes:
+ pgdata:

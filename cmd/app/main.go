@@ -2,11 +2,10 @@ package main
 
 import (
 	"database/sql"
+	db "github.com/netnarkoticam/rest-api2.git/internal/app/migrate"
+	"github.com/netnarkoticam/rest-api2.git/intertnal/app"
 	"log"
 	"os"
-
-	"github.com/netnarkoticam/rest-api2.git/internal/app"
-	db "github.com/netnarkoticam/rest-api2.git/internal/service/pgdb"
 )
 
 func main() {
