@@ -1,15 +1,15 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE employees(
-id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-lastname TEXT NOT NULL,
-firstname TEXT NOT NULL,
-midlename TEXT NOT NULL,
-phone TEXT NOT NULL,
-address TEXT NOT NULL,
-department TEXT NOT NULL,
-hiredate DATE NOT NULL,
-firedate DATE 
+    id SERIAL PRIMARY KEY,
+    last_name TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    middle_name TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    address TEXT NOT NULL,
+    department TEXT NOT NULL,
+    hire_date TIMESTAMP NOT NULL DEFAULT now(),
+    fire_date TIMESTAMP NULL
 );
 -- +goose StatementEnd
 

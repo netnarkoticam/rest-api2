@@ -1,10 +1,10 @@
 package db
 
-impot (
+import (
 	"database/sql"
+	_ "github.com/lib/pq"
+	"github.com/pressly/goose/v3"
 	"log"
-	_"github.com/lib/pq"
-	"gitgub.co,/pressly/goose/v3"
 )
 
 func RunMigrations(db *sql.DB, migrationsDir string) {
