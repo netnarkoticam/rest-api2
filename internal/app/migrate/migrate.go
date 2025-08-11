@@ -1,18 +1,19 @@
-package app
+package migrate
 
 import (
 	"database/sql"
-	_ "github.com/lib/pq"
+	_"github.com/lib/pq"
 	"github.com/pressly/goose/v3"
-	"log"
 )
 
-func RunMigrations(db *sql.DB, migrationsDir string) {
-	if err := goose.SetDialect("postgress"); err != nil {
-		log.Fatalf("Failed to set dialect: %v", err)
+func RunMigrations(db *sql.DB, migrationsDir string) error {
+	if err := goose.SetDialect("postgres"); err != nil {
+		return err
 	}
 
 	if err := goose.Up(db, migrationsDir); err != nil {
-		log.Fatalf("Failed to apply migrations")
+		return err
 	}
+
+	return nil
 }

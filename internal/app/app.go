@@ -2,12 +2,35 @@
 package app
 
 import (
+	"database/sql"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
+	"github.com/netnarkoticam/rest-api2.git/internal/app/migrate"
 )
 
-func RunServer() {
+func Run() {
+	dsn := os.Getenv("PG_URL")
+	if dsn == "" {
+		log.Fatal("Environment variable PG_URL is not set")
+	}
+
+	dbConn, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("Failed to connect to DB: %v", err)
+	}
+	defer dbConn.Close()
+
+	if err = migrate.RunMigrations(dbConn, "./migrations"); err != nil {
+		log.Fatalf("Failed to apply migrations: %v", err)
+	}
+
+	runServer()
+}
+
+func runServer() {
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
