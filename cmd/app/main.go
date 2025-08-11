@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	db "github.com/netnarkoticam/rest-api2.git/internal/app/migrate"
-	"github.com/netnarkoticam/rest-api2.git/intertnal/app"
+	"github.com/netnarkoticam/rest-api2.git/internal/app"
 	"log"
 	"os"
 )
