@@ -12,25 +12,9 @@ import (
 )
 
 func Run() {
-	dsn := os.Getenv("PG_URL")
-	if dsn == "" {
-		log.Fatal("Environment variable PG_URL is not set")
-	}
-
-	dbConn, err := sql.Open("postgres", dsn)
-	if err != nil {
-		log.Fatalf("Failed to connect to DB: %v", err)
-	}
+	dbConn := getDB()
 	defer dbConn.Close()
 
-	if err = migrate.RunMigrations(dbConn, "./migrations"); err != nil {
-		log.Fatalf("Failed to apply migrations: %v", err)
-	}
-
-	runServer()
-}
-
-func runServer() {
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -40,4 +24,22 @@ func runServer() {
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
+}
+
+func getDB() *sql.DB {
+	dsn := os.Getenv("PG_URL")
+	if dsn == "" {
+		log.Fatal("Environment variable PG_URL is not set")
+	}
+
+	dbConn, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("Failed to connect to DB: %v", err)
+	}
+
+	if err = migrate.RunMigrations(dbConn, "./migrations"); err != nil {
+		log.Fatalf("Failed to apply migrations: %v", err)
+	}
+
+	return dbConn
 }
