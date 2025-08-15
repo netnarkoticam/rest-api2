@@ -3,15 +3,16 @@ package config
 import (
 	"errors"
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	DB     DB
-	Server Server
+	DB       DB
+	Postgres Postgres
 }
 
-type Server struct {
+type Postgres struct {
 	HTTP string
 	URL  string
 }
@@ -21,59 +22,10 @@ type DB struct {
 	User     string
 	Password string
 	DBName   string
+	URL      string
 }
 
 var ErrMissingRequiredConfig = errors.New("missing required config")
-
-func getDB(v *viper.Viper) (DB, error) {
-	const (
-		hostPortKey = "POSTGRES_PORT"
-		userKey     = "POSTGRES_USER"
-		passwordKey = "POSTGRES_PASSWORD"
-		nameKey     = "POSTGRES_DB"
-	)
-
-	var db DB
-
-	if !v.IsSet(hostPortKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, hostPortKey)
-	}
-	if !v.IsSet(userKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, userKey)
-	}
-	if !v.IsSet(passwordKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, passwordKey)
-	}
-	if !v.IsSet(nameKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, nameKey)
-	}
-
-	db.HostPort = v.GetString(hostPortKey)
-	db.User = v.GetString(userKey)
-	db.Password = v.GetString(passwordKey)
-	db.DBName = v.GetString(nameKey)
-
-	return db, nil
-}
-
-func getServer(v *viper.Viper) (Server, error) {
-	const (
-		http = "HTTP_PORT"
-		url  = "PG_URL"
-	)
-	var sv Server
-	if !v.IsSet(http) {
-		return sv, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, http)
-	}
-	if !v.IsSet(url) {
-		return sv, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, url)
-	}
-
-	sv.HTTP = v.GetString(http)
-	sv.URL = v.GetString(url)
-
-	return sv, nil
-}
 
 func Get(v *viper.Viper) (Config, error) {
 	v.AutomaticEnv()
@@ -83,14 +35,64 @@ func Get(v *viper.Viper) (Config, error) {
 		return Config{}, err
 	}
 
-	server, err := getServer(v)
+	postgres, err := getPostgres(v)
 	if err != nil {
 		return Config{}, err
 	}
 
 	return Config{
 
-		Server: server,
-		DB:     db,
+		Postgres: postgres,
+		DB:       db,
 	}, nil
+}
+
+func getDB(v *viper.Viper) (DB, error) {
+	const (
+		dbHostPortKey = "POSTGRES_HOSTPORT"
+		dbUserKey     = "POSTGRES_USER"
+		dbPasswordKey = "POSTGRES_PASSWORD"
+		dbNameKey     = "POSTGRES_DB"
+	)
+
+	var db DB
+
+	if !v.IsSet(dbHostPortKey) {
+		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbHostPortKey)
+	}
+	if !v.IsSet(dbUserKey) {
+		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbUserKey)
+	}
+	if !v.IsSet(dbPasswordKey) {
+		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbPasswordKey)
+	}
+	if !v.IsSet(dbNameKey) {
+		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbNameKey)
+	}
+
+	db.HostPort = v.GetString(dbHostPortKey)
+	db.User = v.GetString(dbUserKey)
+	db.Password = v.GetString(dbPasswordKey)
+	db.DBName = v.GetString(dbNameKey)
+
+	return db, nil
+}
+
+func getPostgres(v *viper.Viper) (Postgres, error) {
+	const (
+		pgHTTPKey = "HTTP_PORT"
+		pgURLKey  = "PG_URL"
+	)
+	var pg Postgres
+	if !v.IsSet(pgHTTPKey) {
+		return pg, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, pgHTTPKey)
+	}
+	if !v.IsSet(pgURLKey) {
+		return pg, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, pgURLKey)
+	}
+
+	pg.HTTP = v.GetString(pgHTTPKey)
+	pg.URL = v.GetString(pgURLKey)
+
+	return pg, nil
 }
