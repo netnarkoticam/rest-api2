@@ -8,13 +8,12 @@ import (
 )
 
 type Config struct {
-	DB       DB
-	Postgres Postgres
+	DB   DB
+	HTTP HTTP
 }
 
-type Postgres struct {
-	HTTP string
-	URL  string
+type HTTP struct {
+	HTTPport string
 }
 
 type DB struct {
@@ -35,15 +34,15 @@ func Get(v *viper.Viper) (Config, error) {
 		return Config{}, err
 	}
 
-	postgres, err := getPostgres(v)
+	http, err := getHttp(v)
 	if err != nil {
 		return Config{}, err
 	}
 
 	return Config{
 
-		Postgres: postgres,
-		DB:       db,
+		HTTP: http,
+		DB:   db,
 	}, nil
 }
 
@@ -53,6 +52,7 @@ func getDB(v *viper.Viper) (DB, error) {
 		dbUserKey     = "POSTGRES_USER"
 		dbPasswordKey = "POSTGRES_PASSWORD"
 		dbNameKey     = "POSTGRES_DB"
+		dbURLKey      = "PG_URL"
 	)
 
 	var db DB
@@ -69,6 +69,9 @@ func getDB(v *viper.Viper) (DB, error) {
 	if !v.IsSet(dbNameKey) {
 		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbNameKey)
 	}
+	if !v.IsSet(dbURLKey) {
+		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbURLKey)
+	}
 
 	db.HostPort = v.GetString(dbHostPortKey)
 	db.User = v.GetString(dbUserKey)
@@ -78,21 +81,16 @@ func getDB(v *viper.Viper) (DB, error) {
 	return db, nil
 }
 
-func getPostgres(v *viper.Viper) (Postgres, error) {
+func getHttp(v *viper.Viper) (HTTP, error) {
 	const (
-		pgHTTPKey = "HTTP_PORT"
-		pgURLKey  = "PG_URL"
+		htHTTPKey = "HTTP_PORT"
 	)
-	var pg Postgres
-	if !v.IsSet(pgHTTPKey) {
-		return pg, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, pgHTTPKey)
-	}
-	if !v.IsSet(pgURLKey) {
-		return pg, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, pgURLKey)
+	var ht HTTP
+	if !v.IsSet(htHTTPKey) {
+		return ht, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, htHTTPKey)
 	}
 
-	pg.HTTP = v.GetString(pgHTTPKey)
-	pg.URL = v.GetString(pgURLKey)
+	ht.HTTPport = v.GetString(htHTTPKey)
 
-	return pg, nil
+	return ht, nil
 }

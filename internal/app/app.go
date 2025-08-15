@@ -15,7 +15,7 @@ import (
 func Run() {
 	cfg, err := config.Get(viper.New())
 	if err != nil {
-		log.Error().Err(err).Msg("Ошибка при вызове функции")
+		log.Error().Err(err).Msg("function error")
 		return
 	}
 	dbConn := getDB(cfg)
@@ -27,24 +27,24 @@ func Run() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	if err := r.Run(":" + cfg.Postgres.HTTP); err != nil {
-		log.Error().Err(err).Msg("Ошибка при запуске сервера")
+	if err := r.Run(":" + cfg.DB.URL); err != nil {
+		log.Error().Err(err).Msg("server start error")
 	}
 }
 
 func getDB(cfg config.Config) *sql.DB {
 	dsn := (cfg.DB.URL)
 	if dsn == "" {
-		log.Error().Msg("PG URL не задан")
+		log.Error().Msg("url cant be found")
 	}
 
 	dbConn, err := sql.Open("postgres", dsn)
 	if err != nil {
-		log.Error().Err(err).Msg("Ошибка при подключении к ДБ")
+		log.Error().Err(err).Msg("cant connect to DB")
 	}
 
 	if err = migrate.RunMigrations(dbConn, "./migrations"); err != nil {
-		log.Error().Err(err).Msg("Ошибка при вызове миграций")
+		log.Error().Err(err).Msg("cant summon migrations")
 	}
 
 	return dbConn
