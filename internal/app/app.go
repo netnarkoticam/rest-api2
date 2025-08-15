@@ -4,14 +4,19 @@ package app
 import (
 	"database/sql"
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
+	"github.com/netnarkoticam/rest-api2.git/config"
 	"github.com/netnarkoticam/rest-api2.git/internal/app/migrate"
+	"github.com/spf13/viper"
 )
 
 func Run() {
+	cfg, err := config.Get(viper.New())
+	if err != nil {
+		log.Fatalf("Get config %v", cfg)
+	}
 	dbConn := getDB()
 	defer dbConn.Close()
 
@@ -21,13 +26,17 @@ func Run() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":" + cfg.Server.HTTP); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
 
 func getDB() *sql.DB {
-	dsn := os.Getenv("PG_URL")
+	cfg, err := config.Get(viper.New())
+	if err != nil {
+		log.Fatalf("Get config %v", cfg)
+	}
+	dsn := (cfg.Server.URL)
 	if dsn == "" {
 		log.Fatal("Environment variable PG_URL is not set")
 	}
