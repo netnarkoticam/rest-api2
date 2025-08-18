@@ -7,24 +7,20 @@ import (
 	"github.com/spf13/viper"
 )
 
+var ErrMissingRequiredConfig = errors.New("missing required config")
+
 type Config struct {
-	DB   DB
 	HTTP HTTP
+	DB   DB
 }
 
 type HTTP struct {
-	HTTPport string
+	Port string
 }
 
 type DB struct {
-	HostPort string
-	User     string
-	Password string
-	DBName   string
-	URL      string
+	URL string
 }
-
-var ErrMissingRequiredConfig = errors.New("missing required config")
 
 func Get(v *viper.Viper) (Config, error) {
 	v.AutomaticEnv()
@@ -34,63 +30,41 @@ func Get(v *viper.Viper) (Config, error) {
 		return Config{}, err
 	}
 
-	http, err := getHttp(v)
+	http, err := getHTTP(v)
 	if err != nil {
 		return Config{}, err
 	}
 
 	return Config{
-
 		HTTP: http,
 		DB:   db,
 	}, nil
 }
 
 func getDB(v *viper.Viper) (DB, error) {
-	const (
-		dbHostPortKey = "POSTGRES_HOSTPORT"
-		dbUserKey     = "POSTGRES_USER"
-		dbPasswordKey = "POSTGRES_PASSWORD"
-		dbNameKey     = "POSTGRES_DB"
-		dbURLKey      = "PG_URL"
-	)
+	const urlKey = "PG_URL"
 
 	var db DB
 
-	if !v.IsSet(dbHostPortKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbHostPortKey)
-	}
-	if !v.IsSet(dbUserKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbUserKey)
-	}
-	if !v.IsSet(dbPasswordKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbPasswordKey)
-	}
-	if !v.IsSet(dbNameKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbNameKey)
-	}
-	if !v.IsSet(dbURLKey) {
-		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, dbURLKey)
+	if !v.IsSet(urlKey) {
+		return db, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, urlKey)
 	}
 
-	db.HostPort = v.GetString(dbHostPortKey)
-	db.User = v.GetString(dbUserKey)
-	db.Password = v.GetString(dbPasswordKey)
-	db.DBName = v.GetString(dbNameKey)
+	db.URL = v.GetString(urlKey)
 
 	return db, nil
 }
 
-func getHttp(v *viper.Viper) (HTTP, error) {
-	const (
-		htHTTPKey = "HTTP_PORT"
-	)
-	var ht HTTP
-	if !v.IsSet(htHTTPKey) {
-		return ht, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, htHTTPKey)
+func getHTTP(v *viper.Viper) (HTTP, error) {
+	const portKey = "HTTP_PORT"
+
+	var http HTTP
+
+	if !v.IsSet(portKey) {
+		return http, fmt.Errorf("%w: %s", ErrMissingRequiredConfig, portKey)
 	}
 
-	ht.HTTPport = v.GetString(htHTTPKey)
+	http.Port = v.GetString(portKey)
 
-	return ht, nil
+	return http, nil
 }

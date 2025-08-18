@@ -18,6 +18,7 @@ func Run() {
 		log.Error().Err(err).Msg("function error")
 		return
 	}
+
 	dbConn := getDB(cfg)
 	defer dbConn.Close()
 
@@ -27,7 +28,7 @@ func Run() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	if err := r.Run(":" + cfg.DB.URL); err != nil {
+	if err := r.Run(":" + cfg.HTTP.Port); err != nil {
 		log.Error().Err(err).Msg("server start error")
 	}
 }
