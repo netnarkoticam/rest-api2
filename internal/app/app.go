@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	"github.com/gin-gonic/gin"
+
+	// postgres драйвер.
 	_ "github.com/lib/pq"
 	"github.com/netnarkoticam/rest-api2.git/config"
 	"github.com/netnarkoticam/rest-api2.git/internal/app/migrate"
@@ -28,8 +30,9 @@ func Run() {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	if err := r.Run(":" + cfg.HTTP.Port); err != nil {
-		log.Error().Err(err).Msg("server start error")
+	errRun := r.Run(":" + cfg.HTTP.Port)
+	if errRun != nil {
+		log.Error().Err(errRun).Msg("server start error")
 	}
 }
 

@@ -3,6 +3,7 @@ package migrate
 import (
 	"database/sql"
 
+	// postgres драйвер.
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 )
